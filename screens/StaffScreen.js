@@ -1,14 +1,22 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, TouchOpacity } from 'react-native'
-import { DataTable, IconButton } from 'react-native-paper';
+import { Alert, Button, View, Text, RefreshControl, ScrollView, StyleSheet } from 'react-native'
+import { DataTable, IconButton, Modal, Portal, Provider } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios'
+
+import AddStaffForm from '../components/AddStaffForm'
 
 const API_URL = 'https://crudcrud.com/api/ee3ecf6285df4f87ba4a700facb71e57/zamara'
 
 const StaffScreen = () => {
   const [staffList, setStaffList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [visible, setVisible] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
+  const containerStyle = {backgroundColor: 'white', padding: 20};
 
   const loadStaffList = async () => {
     try {
@@ -21,14 +29,38 @@ const StaffScreen = () => {
     }
   };
 
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      loadStaffList()
+      setRefreshing(false);
+    }, 1000);
+  }, []);
+
+  const deleteStaff = async (id) => {
+    await axios.delete(`${API_URL}/${id}`);
+    Alert.alert('Staff Deleted Successfully!');
+    await loadStaffList();
+  };
+
   useEffect(() => {
     loadStaffList();
   }, []);
 
   return (
-    <View>
+    <Provider>
     {loading ? (<Text> loading...</Text> ) : (
+      <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }>
       <DataTable>
+        <Portal>
+          <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={containerStyle}>
+            <AddStaffForm />
+          </Modal>
+        </Portal>
+        <Button onPress={showModal} title='Add Staff' />
         <DataTable.Header>
           <DataTable.Title>Staff Number</DataTable.Title>
           <DataTable.Title>Staff Name</DataTable.Title>
@@ -40,7 +72,7 @@ const StaffScreen = () => {
         </DataTable.Header>
 
         {staffList?.map((staff) => (
-          <DataTable.Row key={staff.id}>
+          <DataTable.Row key={staff._id}>
             <DataTable.Cell>{staff.Staff_Number}</DataTable.Cell>
             <DataTable.Cell>{staff.Staff_Name}</DataTable.Cell>
             <DataTable.Cell>{staff.Staff_Email}</DataTable.Cell>
@@ -59,7 +91,7 @@ const StaffScreen = () => {
                   icon='trash-can' 
                   size={20} 
                   color='red'
-                  onPress={() => console.log('Delete!!!')}
+                  onPress={() => deleteStaff(staff._id)}
                 />
             </DataTable.Cell>
           </DataTable.Row>
@@ -74,9 +106,22 @@ const StaffScreen = () => {
           label="1-2 of 6"
         />
       </DataTable>
+      </ScrollView>
       )}
-    </View>
+    </Provider>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+    backgroundColor: 'pink',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
 
 export default StaffScreen
