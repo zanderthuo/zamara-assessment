@@ -1,28 +1,31 @@
-import nodemailer from 'nodemailer';
+import Mailer from 'react-native-smtp-mailer';
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
-  auth: {
-    user: 'your_email_address',
-    pass: 'your_email_password',
-  },
-});
+export const sendEmailNotification = (profile, type) => {
+  const greeting = `Greeting ${profile.name},`;
+  let subject = '';
+  let body = '';
 
-const sendEmail = () => {
-  const mailOptions = {
-    from: 'your_email_address',
-    to: 'recipient_email_address',
-    subject: 'Test Email',
-    text: 'This is a test email sent from my React Native app!',
-  };
+  switch (type) {
+    case 'created':
+      subject = 'Profile Notification #Created';
+      body = `${greeting} we are glad to inform you that your staff profile has been created.`;
+      break;
+    case 'updated':
+      subject = 'Profile Notification #Edited';
+      body = `${greeting} we are glad to inform you that your staff profile has been updated.`;
+      break;
+    case 'deleted':
+      subject = 'Profile Notification #Deleted';
+      body = `${greeting} we are sad to inform you that your staff profile has been deleted.`;
+      break;
+    default:
+      break;
+  }
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error(error);
-    } else {
-      console.log('Email sent: ' + info.response);
-    }
+  Mailer.mail({
+    subject,
+    recipients: [profile.email],
+    body,
+    isHTML: true,
   });
 };

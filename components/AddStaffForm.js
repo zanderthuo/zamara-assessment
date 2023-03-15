@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Alert, Button, View, Text, TouchOpacity } from 'react-native'
 import { Form, FormItem } from 'react-native-form-component';
 import axios from 'axios';
+import sendEmailNotification from '../Mailer'
 
 const AddStaffForm = () => {
   const [Staff_Number, setStaff_Number] = useState('')
@@ -12,21 +13,28 @@ const AddStaffForm = () => {
 
   const createStaff = async () => {
     try {
-      await axios.post('https://crudcrud.com/api/ee3ecf6285df4f87ba4a700facb71e57/zamara', {
-      Staff_Number,
-      Staff_Name,
-      Staff_Email,
-      Department,
-      Salary,
-    });
+      const formData = {
+        Staff_Number,
+        Staff_Name,
+        Staff_Email,
+        Department,
+        Salary,
+      };
+  
+      await axios.post(
+        'https://crudcrud.com/api/090ca2fb2cc34509a7787bf3d2b59e9f/zamara',
+        formData
+      );
+  
       setStaff_Number('');
       setStaff_Name('');
       setStaff_Email('');
       setDepartment('');
       setSalary('');
+  
       Alert.alert('New Staff created Successfully!');
     } catch (error) {
-      console.log("error")
+      console.log(error);
     }
   };
 
@@ -64,7 +72,7 @@ const AddStaffForm = () => {
         <FormItem
           label="Salary"
           isRequired
-          value={Salary}
+          value={setSalary}
           onChangeText={(Salary) => setSalary(Salary)}
           asterik
         />

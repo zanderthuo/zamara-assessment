@@ -1,22 +1,57 @@
 import React, { useState, useEffect } from 'react'
-import { Alert, Button, View, Text, RefreshControl, ScrollView, StyleSheet } from 'react-native'
+import { 
+  Alert, 
+  Button, 
+  View, 
+  Text, 
+  RefreshControl, 
+  ScrollView, 
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native'
 import { DataTable, IconButton, Modal, Portal, Provider } from 'react-native-paper';
+import { Form, FormItem } from 'react-native-form-component';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { useNavigation } from '@react-navigation/native';
 import axios from 'axios'
 
 import AddStaffForm from '../components/AddStaffForm'
+import EditStaffForm from '../components/EditStaffForm'
 
-const API_URL = 'https://crudcrud.com/api/ee3ecf6285df4f87ba4a700facb71e57/zamara'
+const API_URL = 'https://crudcrud.com/api/090ca2fb2cc34509a7787bf3d2b59e9f/zamara'
 
 const StaffScreen = () => {
   const [staffList, setStaffList] = useState([]);
+  const [staffDetails, setStaffDetails] = useState({});
   const [loading, setLoading] = useState(true);
   const [visible, setVisible] = useState(false);
+  const [selectedStaff, setSelectedStaff] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const [Staff_Number, setStaff_Number] = useState('')
+  const [Staff_Name, setStaff_Name] = useState('')
+  const [Staff_Email, setStaff_Email] = useState('')
+  const [Department, setDepartment] = useState('')
+  const [Salary, setSalary] = useState('')
+
+  const navigation = useNavigation();
+
+  const handleEditPress = async (_id) => {
+    try {
+      const response = await axios.get(`https://crudcrud.com/api/090ca2fb2cc34509a7787bf3d2b59e9f/zamara/${_id}`)
+      console.log('staff edit>>>',response.data._id)
+      navigation.navigate('EditScreen', { staffDetails: response.data });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
   const containerStyle = {backgroundColor: 'white', padding: 20};
+
+  const handleFormSubmit = () => {}
 
   const loadStaffList = async () => {
     try {
@@ -83,7 +118,7 @@ const StaffScreen = () => {
               icon='pencil' 
               size={20} 
               color='firebrick'
-              onPress={() => console.log('Edit')}
+              onPress={() => handleEditPress(staff._id)}
             />
             </DataTable.Cell>
             <DataTable.Cell>

@@ -10,6 +10,7 @@ import StaffScreen from '../screens/StaffScreen'
 import ContinentsScreen from '../screens/ContinentsScreen'
 import LoginScreen from '../screens/LoginScreen'
 import StartScreen from '../screens/StartScreen'
+import EditStaffScreen from '../screens/EditStaffScreen'
 
 const Drawer = createDrawerNavigator();
 
@@ -22,6 +23,7 @@ const Menu = () => {
         <Drawer.Screen name="Staff" component={StaffScreen} />
         <Drawer.Screen name="Continents" component={ContinentsScreen} />
         <Drawer.Screen name="Login" component={LoginScreen} />
+        <Drawer.Screen name="EditScreen" component={EditStaffScreen} />
       </Drawer.Navigator>
     </NavigationContainer>
   )
